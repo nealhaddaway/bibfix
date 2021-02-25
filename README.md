@@ -22,7 +22,7 @@ The package is a work in progress and is part of the
 <a href="https://www.eshackathon.org/" target="_blank">Evidence
 Synthesis Hackathon</a>.
 
-Please cite this package as: Haddaway NR, Jones ML and Grainger MJ
+Please cite this package as: Haddaway NR, Jones ML, Grainger MJ, and Westgate MJ
 (2021). bibfix: An R package and Shiny app for repairing and enriching
 bibliographic data.
 <a href="https://github.com/nealhaddaway/bibfix" target="_blank">https://github.com/nealhaddaway/bibfix</a>.
