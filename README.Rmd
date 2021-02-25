@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# bibfix
+# bibfix <img src="inst/extdata/bibfix hex.png" align="right" width="20%"/>
 
 <!-- badges: start -->
 <!-- badges: end -->
