@@ -5,7 +5,7 @@
 #' @param journal_names column in the dataframe that contains the titles of the sources
 
 journal_abbreviation <- function(data, journal_names) {
-  journal_names <- enquo(journal_names)
+  journal_names <- dplyr::enquo(journal_names)
   ref_list <- bibfix::wos_abbrev_table
   ref_list <- ref_list %>%
     mutate(source = str_to_sentence(full))
