@@ -1,0 +1,37 @@
+Package: bibfix
+Title: Repair and enrich bibliographic data
+Version: 0.0.0.9
+Authors@R: c(
+    person(given = "Neal",
+           family = "Haddaway",
+           role = c("aut", "cre"),
+           email = "nealhaddaway@gmail.com",
+           comment = c(ORCID = "0000-0003-3902-2234")),
+    person("Matt", "Grainger", role = "aut",
+           email = "matthew.grainger@nina.no",
+           comment = c(ORCID = "0000-0001-8426-6495")),
+    person("Matt", "Jones", role = "aut",
+            email = "m.l.jones@exeter.ac.uk",
+            comment = c(ORCID = "0000-0001-5841-4554")),
+    person("Alice", "Stuart", role = "aut",
+           email = "alice.stuart@uea.ac.uk",
+           comment = c(ORCID = "0000-0001-5208-8030"))
+           )
+Description: bibfix is an R package (with future plans for a Shiny app) that 
+    helps users repair and enrich their bibliographic data. It does so 
+    through a suite of functions that request bibliographic data from API 
+    services including CrossRef and The Lens.org. Repaired fields can include 
+    titles, abstract, unique identifiers (e.g. DOIs), publication years, etc. 
+    In addition, bibliographic records can be supplemented with additional 
+    information, including internal identifiers for common databases (e.g. 
+    The Lens.org, PubMed, Microsoft Academic) that facilitate deduplication, 
+    and information such as author affiliations and identifiers (e.g. ORCIDs). 
+    The package is a work in progress and is part of the Evidence Synthesis 
+    Hackathon.
+Imports:
+    utils,
+    tools
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
