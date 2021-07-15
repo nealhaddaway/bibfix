@@ -4,7 +4,6 @@
 # bibfix <img src="inst/extdata/bibfix hex.png" align="right" width="20%"/>
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 bibfix is an R package (with future plans for a Shiny app) that helps
@@ -22,7 +21,7 @@ The package is a work in progress and is part of the
 <a href="https://www.eshackathon.org/" target="_blank">Evidence
 Synthesis Hackathon</a>.
 
-Please cite this package as: Haddaway NR, Jones ML and Grainger MJ
-(2021). bibfix: An R package and Shiny app for repairing and enriching
-bibliographic data.
+Please cite this package as: Haddaway NR, Grainger MJ, Jones ML and
+Stuart A (2021). bibfix: An R package and Shiny app for repairing and
+enriching bibliographic data.
 <a href="https://github.com/nealhaddaway/bibfix" target="_blank">https://github.com/nealhaddaway/bibfix</a>.
