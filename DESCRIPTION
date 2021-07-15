@@ -29,6 +29,7 @@ Description: bibfix is an R package (with future plans for a Shiny app) that
     The package is a work in progress and is part of the Evidence Synthesis 
     Hackathon.
 Imports:
+    magrittr,
     utils,
     tools
 License: MIT + file LICENSE
