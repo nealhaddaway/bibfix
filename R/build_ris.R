@@ -39,6 +39,7 @@ build_ris <- function(data,
                       'VL  - ', data$volume, '\n',
                       'IS  - ', data$issue, '\n',
                       'DO  - ', data$doi, '\n',
+                      'UR  - ', data$url, '\n',
                       'ER  - '),
                collapse = '\n')
   
