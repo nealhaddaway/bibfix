@@ -29,8 +29,7 @@ get_abstract <- function(bib_data){
   
   #start timer
   t0 <- Sys.time()
-  pb <- tcltk::tkProgressBar(title = "progress bar", min = 0,
-                      max = nrow(doi_query), width = 300)
+  pb <- txtProgressBar(min = 0, max = nrow(doi_query), style = 3)
   for (a in 1:nrow(doi_query)){
     #send the doi of the record as a query to CrossRef and get results back
     data <- data.frame(doi = doi_query$doi[a],
@@ -38,8 +37,7 @@ get_abstract <- function(bib_data){
                          tryCatch(
                            rcrossref::cr_abstract(doi = doi_query$doi[a]), 
                            error=function(e) {return(NA)}))
-    tcltk::setTkProgressBar(pb, a, label=paste( round(i/total*100, 0),
-                                         "% complete"))
+    setTxtProgressBar(pb, a)
     #print(paste0('record ', a, ' retrieved'))
     results <- rbind(results, data)
   }
