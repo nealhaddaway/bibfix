@@ -17,6 +17,10 @@
 #' @return A revised dataframe containing records for which the abstract 
 #' could be retrieved.
 #' @importFrom rcrossref cr_abstract
+#' @importFrom dplyr rename mutate coalesce
+#' @importFrom httr content
+#' @importFrom jsonlite fromJSON
+#' @importFrom expss vlookup
 #' @export
 #' @examples 
 #' \dontrun{
