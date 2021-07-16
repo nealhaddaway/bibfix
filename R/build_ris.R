@@ -51,7 +51,7 @@ build_ris <- function(data,
   
   #generate report if file exported as .ris
   if (save == TRUE){
-    write.table(ris, file = paste0(path, filename, '.ris'))
+    write.table(ris, file = paste0(path, filename, '.ris'), row.names = FALSE, col.names = FALSE)
     if (is.null(path) == TRUE){
       location <- 'your working directory'
     } else {
