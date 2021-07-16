@@ -10,6 +10,10 @@
 #' columns named as follows: 'authors', 'year', 'title', 
 #' 'source', 'volume', 'issue', 'start_page', 'end_page', 
 #' and 'doi'.
+#' @param save Logical argument to specify whether the output 
+#' file should be saved as an .ris file.
+#' @param filename Optional name of the output file if 
+#' save = TRUE. Default is 'export'.
 #' @param path Path to which file should be saved.
 #' @return An RIS formatted text file saved to the desired 
 #' path.
@@ -20,8 +24,8 @@
 #' ris <- build_ris(data, save=TRUE)
 #' }
 build_ris <- function(data,
-                      filename = 'export',
                       save = FALSE,
+                      filename = 'export',
                       path = NULL){
   
   if (is.data.frame(data) == FALSE){
