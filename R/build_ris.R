@@ -17,9 +17,11 @@
 #' @examples 
 #' \dontrun{
 #' data <- read.csv('inst/extdata/data.csv')
-#' build_ris(data)
+#' ris <- build_ris(data, save=TRUE)
 #' }
 build_ris <- function(data,
+                      filename = 'export',
+                      save = FALSE,
                       path = NULL){
   
   if (is.data.frame(data) == FALSE){
@@ -43,6 +45,18 @@ build_ris <- function(data,
                       'ER  - '),
                collapse = '\n')
   
-  write.table(ris, file = paste0(path, "export.ris"), sep = "")
+  #generate report if file exported as .ris
+  if (save == TRUE){
+    write.table(ris, file = paste0(path, filename, '.ris'))
+    if (is.null(path) == TRUE){
+      location <- 'your working directory'
+    } else {
+      location <- paste0(path)
+    }
+    report <- paste0('The output file "', filename, '.ris" has been saved to ', location)
+    message(report)
+  }
+  
+  return(ris)
   
 }
