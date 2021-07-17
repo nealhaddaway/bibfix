@@ -10,6 +10,7 @@
 #'   'content(data, "text")'. Other details regarding the request (e.g. repsonse 
 #'   times) can be accessed through the main output.
 #' @importFrom httr add_headers POST
+#' @export
 getLENSData <- function(token, query){
   url <- 'https://api.lens.org/scholarly/search'
   headers <- c('Authorization' = token, 'Content-Type' = 'application/json')

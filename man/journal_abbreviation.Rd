@@ -18,7 +18,7 @@ Support matching where journal cannot be found but there is an almost full match
 \examples{
 \dontrun{
 bib_data <- synthesisr::read_refs('inst/extdata/export.ris')
-bib_data_new <- journal_abbreviation(bib_data, bib_data$journal)
+bib_data_new <- journal_abbreviation(data = bib_data, journal_names = bib_data$journal)
 }
 
 }
