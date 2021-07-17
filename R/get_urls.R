@@ -12,6 +12,17 @@
 #' application for a free, time-limited API token. The ShinyApp includes 
 #' token-free access. Other users must request a Lens.org token here: 
 #' https://www.lens.org/lens/user/subscriptions#scholar.
+#' @param add_GSlink Logical argument specifying whether to generate a 
+#' Google Scholar link for the record based on the title. The default 
+#' is FALSE.
+#' @param convert_doi Logical argument specifying whether to convert the 
+#' DOI into a URL by appending 'https://doi.org/'. The default is FALSE.
+#' @param add_scihub Logical argument specifying whether to generate a 
+#' SciHub link for the record based on the DOI. The default is FALSE.
+#' @param scihub_stem Character string for the base URL for SciHub. At 
+#' the time of writing, this was 'https://sci-hub.se/' (default value), 
+#' but this is likely to move over time, so should be specified here if 
+#' a base URL is known to function.
 #' @param combine Logical argument to set whether the url outputs 
 #' should be combined into a single field (needed for exporting as an 
 #' RIS), or whether they should be retained as seperate columns in the 
@@ -19,14 +30,23 @@
 #' @return A revised dataframe containing various urls for records that 
 #' could be found using the API.
 #' @importFrom roadoi oadoi_fetch
+#' @importFrom dplyr rename select
+#' @importFrom httr content
+#' @importFrom jsonlite fromJSON
+#' @importFrom expsss vlookup
+#' @importFrom tidyr unite
 #' @export
 #' @examples 
 #' \dontrun{
 #' bib_data<-revtools::read_bibliography('inst/extdata/export.ris')
-#' get_urls(bib_data)
+#' data <- get_urls(bib_data, add_GSlink = TRUE, convert_doi = TRUE, add_scihub = TRUE, combine = FALSE)
 #' }
 get_urls <- function(bib_data,
                      source = 'lens',
+                     add_GSlink = FALSE,
+                     convert_doi = FALSE,
+                     add_scihub = FALSE,
+                     scihub_stem = 'https://sci-hub.se/',
                      combine = TRUE){
   
   #if bibliographic data lacks url field, add an empty one
@@ -137,13 +157,6 @@ get_urls <- function(bib_data,
     returns_pdf <- nrow(subset(results, is.na(results$url_pdf) == FALSE))
     results <- merge(x = bib_data, y = results, by.x = 'doi', by.y = 'doi', all.x = TRUE)
     
-    #if combine = TRUE, combine fields
-    new_url <- paste(results$url, results$url_html, results$url_pdf, sep = ' ')
-    new_url <- stringr::str_replace_all(new_url, "NA", "")
-    new_url <- gsub("\\s+", " ", stringr::str_trim(new_url))
-    results$url <- stringr::str_replace_all(new_url, " ", "; ")
-    results <- subset(results, select = -c(url_html, url_pdf))
-    
     #compile report and print to console
     report <- paste0('Your bibliographic dataset contained ',
                      nrow(missing_url),
@@ -157,8 +170,38 @@ get_urls <- function(bib_data,
                      if(combine == TRUE){' The resulting URLs have been condensed into a single field for RIS export.'})
     
   }
+  
+  # Add in Google Scholar link to title search result----
+  if (add_GSlink == TRUE){
+    results$url_GS <- sub(" ", "", paste0("https://scholar.google.co.uk/scholar?start=0&q=", gsub(" ", "+", (gsub("[[:punct:]]", "", results$title))), "&hl=en&as_sdt=0,5"))
+  }
+  
+  # Add in SciHub link to title search result----
+  if (add_scihub == TRUE){
+    results$url_scihub <- paste0(scihub_stem, results$doi)
+    results$url_scihub <- gsub(paste0(scihub_stem, 'NA'), '', results$url_scihub)
+  }
+  
+  # Convert doi into url
+  if (convert_doi == TRUE){
+    results$url_doi <- paste0('https://doi.org/', results$doi)
+    results$url_doi <- gsub('https://doi.org/NA', '', results$url_doi)
+  }
 
+  #if combine = TRUE, combine fields
+  if (combine == TRUE){
+    #identify all columns starting with 'url'
+    url_cols <- results[,grep("url", names(results), value=TRUE)]
+    #combine these columns into a single column
+    new_url <- tidyr::unite(url_cols, url, sep = ' ')
+    new_url <- sapply(new_url, function(x) {gsub(' ', '; ', trimws(gsub('  ', ' ',(gsub('NA', '', x)))))})
+    #drop all url columns
+    results <- dplyr::select(results, -contains("url"))
+    #add the new url column back in
+    results$url <- new_url[,1]
+  }
+  
   print(report)
-  return()
+  return(results)
   
 }
