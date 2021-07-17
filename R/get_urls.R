@@ -61,10 +61,9 @@ get_urls <- function(bib_data,
   url_query <- subset(missing_url, is.na(doi) == FALSE)
   
   # Get results from Unpaywall via roadoi package----
-  #not sure if this is working... 
   if (identical(source, 'unpaywall') == TRUE){
     #reset results
-    results <- data.frame(doi = NULL, url = NULL)
+    results <- data.frame(doi = NULL, url_html = NULL, url_pdf = NULL, oa_status = NULL)
     
     #start timer
     t0 <- Sys.time()
@@ -87,9 +86,10 @@ get_urls <- function(bib_data,
       
       #build dataframe
       data <- data.frame(doi = url_query$doi[a],
-                         url = url_best,
-                         pdf = url_pdf,
-                         oa_status = oa_status)
+                         url_html = url_best,
+                         url_pdf = url_pdf
+                         #,oa_status = oa_status
+                         )
       results <- rbind(results, data)
     }
     #stop timer
@@ -98,14 +98,20 @@ get_urls <- function(bib_data,
     time <- t1 - t0
     
     #join and tidy up the results
-    returns <- nrow(subset(results, is.na(url) == FALSE))
+    returns_html <- nrow(subset(results, is.na(url_html) == FALSE))
+    returns_pdf <- nrow(subset(results, is.na(url_pdf) == FALSE))
     results <- merge(x = bib_data, y = results, by = "doi", all.x = TRUE)
-    results <- subset(results, select = -c(abstract.x))
-    results <- dplyr::rename(results, abstract = abstract.y)
     
     report <- paste0('Your bibliographic dataset contained ',
-                     nrow(missing_doi),
-                     ' records without digital object identifiers.')
+                     nrow(missing_url),
+                     ' records without URLs, ',
+                     nrow(url_query),
+                     ' of which had DOIs that could be used to search for URLs on Unpaywall. ',
+                     returns_html,
+                     ' of these records had URLs corresponding to web locations and ',
+                     returns_pdf,
+                     ' had URLs corresponding to PDF versions on Unpaywall.',
+                     if(combine == TRUE){' The resulting URLs have been condensed into a single field for RIS export.'})
   }
   
   
