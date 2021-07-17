@@ -4,9 +4,15 @@
 \alias{build_ris}
 \title{Build RIS files from other sources}
 \usage{
-build_ris(data, path = NULL)
+build_ris(data, save = FALSE, filename = "export", path = NULL)
 }
 \arguments{
+\item{save}{Logical argument to specify whether the output
+file should be saved as an .ris file.}
+
+\item{filename}{Optional name of the output file if
+save = TRUE. Default is 'export'.}
+
 \item{path}{Path to which file should be saved.}
 
 \item{input}{A dataframe object containing bibliographic
@@ -29,6 +35,6 @@ API sources (e.g. CrossRef).
 \examples{
 \dontrun{
 data <- read.csv('inst/extdata/data.csv')
-build_ris(data)
+ris <- build_ris(data, save=TRUE)
 }
 }

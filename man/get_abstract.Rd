@@ -4,13 +4,21 @@
 \alias{get_abstract}
 \title{Get abstracts for bibliographic records missing them}
 \usage{
-get_abstract(bib_data)
+get_abstract(bib_data, source = "crossref", token = NULL)
 }
 \arguments{
 \item{bib_data}{A bibliographic data set stored as a dataframe, with
 each record as a row. Records must contains a column called 'abstract'
 that contains the record title, and a column called 'doi' that
 contains (or would contain) the DOIs.}
+
+\item{source}{Source to use for obtaining information. Options are
+CrossRef ('crossref') or The Lens.org ('lens'). The former is free
+and requires only registration of an email address within the R
+environment. The Lens.org requires application for a free,
+time-limited API token. The ShinyApp includes token-free access.
+Other users must request a Lens.org token here:
+https://www.lens.org/lens/user/subscriptions#scholar.}
 }
 \value{
 A revised dataframe containing records for which the abstract
@@ -25,5 +33,6 @@ identifier).
 \dontrun{
 bib_data <- synthesisr::read_refs('inst/extdata/export.ris')
 bib_data_new <- get_abstract(bib_data)
+bib_data_new <- get_abstract(bib_data, source = 'lens', token = token)
 }
 }

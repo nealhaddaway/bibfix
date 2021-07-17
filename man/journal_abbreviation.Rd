@@ -15,3 +15,10 @@ journal_abbreviation(data, journal_names)
 convert between abbreviated and long forms of journal names based on an updatable dataframe of abbreviations and full names.
 Support matching where journal cannot be found but there is an almost full match with abbreviated or unabbreviated journal name
 }
+\examples{
+\dontrun{
+bib_data <- synthesisr::read_refs('inst/extdata/export.ris')
+bib_data_new <- journal_abbreviation(bib_data, bib_data$journal)
+}
+
+}

@@ -33,7 +33,7 @@
 #' @importFrom dplyr rename select
 #' @importFrom httr content
 #' @importFrom jsonlite fromJSON
-#' @importFrom expsss vlookup
+#' @importFrom expss vlookup
 #' @importFrom tidyr unite
 #' @export
 #' @examples 

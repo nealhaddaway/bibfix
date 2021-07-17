@@ -4,12 +4,48 @@
 \alias{get_urls}
 \title{Get URL links}
 \usage{
-get_urls(bib_data)
+get_urls(
+  bib_data,
+  source = "lens",
+  add_GSlink = FALSE,
+  convert_doi = FALSE,
+  add_scihub = FALSE,
+  scihub_stem = "https://sci-hub.se/",
+  combine = TRUE
+)
 }
 \arguments{
 \item{bib_data}{A bibliographic data set stored as a dataframe, with
 each record as a row. Records must contains a column called 'doi' that
 contains the DOIs for the records.}
+
+\item{source}{Source to use for obtaining information. Options are
+Unpaywall ('unpaywall', searched via the roadoi package) or The
+Lens.org ('lens'). The former is freeand requires only registration
+of an email address within the R environment. The Lens.org requires
+application for a free, time-limited API token. The ShinyApp includes
+token-free access. Other users must request a Lens.org token here:
+https://www.lens.org/lens/user/subscriptions#scholar.}
+
+\item{add_GSlink}{Logical argument specifying whether to generate a
+Google Scholar link for the record based on the title. The default
+is FALSE.}
+
+\item{convert_doi}{Logical argument specifying whether to convert the
+DOI into a URL by appending 'https://doi.org/'. The default is FALSE.}
+
+\item{add_scihub}{Logical argument specifying whether to generate a
+SciHub link for the record based on the DOI. The default is FALSE.}
+
+\item{scihub_stem}{Character string for the base URL for SciHub. At
+the time of writing, this was 'https://sci-hub.se/' (default value),
+but this is likely to move over time, so should be specified here if
+a base URL is known to function.}
+
+\item{combine}{Logical argument to set whether the url outputs
+should be combined into a single field (needed for exporting as an
+RIS), or whether they should be retained as seperate columns in the
+dataset. Default is to combine (combine = TRUE).}
 }
 \value{
 A revised dataframe containing various urls for records that
@@ -22,5 +58,6 @@ from various sources.
 \examples{
 \dontrun{
 bib_data<-revtools::read_bibliography('inst/extdata/export.ris')
+data <- get_urls(bib_data, add_GSlink = TRUE, convert_doi = TRUE, add_scihub = TRUE, combine = FALSE)
 }
 }
