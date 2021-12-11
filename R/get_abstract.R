@@ -29,7 +29,7 @@
 #' bib_data_new <- get_abstract(bib_data, source = 'lens', token = token)
 #' }
 get_abstract <- function(bib_data,
-                         source = 'crossref',
+                         source = 'lens',
                          token = NULL){
   
   bib_data <- bib_data
