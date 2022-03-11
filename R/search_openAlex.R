@@ -10,13 +10,16 @@
 #' identifier), and 'title' (record title), and one column that contains 
 #' the corresponding identifier type for each ID (using those names listed 
 #' here).
+#' @export
 #' @examples 
+#' \dontrun{
 #' devtools::install_github("kth-library/openalex", dependencies = TRUE)
 #' library(openalex)
 #' openalex_polite("neal_haddaway@hotmail.com")
 #' input <- data.frame(ids = c('10.1371/journal.pone.0138237', '10.1186/s13750-016-0059-6', 'The role of tourism and recreation in the spread of non-native species: a systematic review and meta-analysis'),
 #'                     type = c('doi', 'doi', 'title'))
 #' results <- search_openAlex(input)
+#' }
 search_openAlex <- function(input){
   
   titles <- subset(input, type == 'title')
@@ -34,7 +37,7 @@ search_openAlex <- function(input){
     result_df <- openalex::openalex_work(identifier = paste0(other_ids$type[i], ":", other_ids$ids[i]))
     result_list <- as.character(result_df$value)
     names(result_list) <- result_df$name
-    result_list <- list(as.list(result_list))
+    result_list <- list(result_list)
     names(result_list) <- other_ids$ids[i]
     ids_outputs <- c(ids_outputs, result_list)
   }
