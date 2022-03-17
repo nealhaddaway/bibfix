@@ -1,0 +1,11 @@
+name: bibfix
+title:
+username:
+account: estech
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5873635
+bundleId: 5694843
+url: https://estech.shinyapps.io/bibfix/
+when: 1647514798.49585
+lastSyncTime: 1647514798.49586

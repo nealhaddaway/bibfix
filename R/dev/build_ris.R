@@ -34,18 +34,19 @@ build_ris <- function(data,
   
   #create RIS file
   ris <- paste(paste0('\n',
-                      'TY  - ', data$type, '\n',
-                      'AU  - ', data$authors, '\n',
+                      'TY  - ', data$source_type, '\n',
+                      'AU  - ', data$author, '\n',
                       'TI  - ', data$title, '\n',
                       'PY  - ', data$year, '\n',
                       'AB  - ', data$abstract, '\n',
                       'SP  - ', data$start_page, '\n',
                       'EP  - ', data$end_page, '\n',
-                      'JF  - ', data$source, '\n',
+                      'JF  - ', data$journal, '\n',
                       'VL  - ', data$volume, '\n',
                       'IS  - ', data$issue, '\n',
                       'DO  - ', data$doi, '\n',
-                      'UR  - ', data$url, '\n',
+                    # 'UR  - ', data$url, '\n',
+                      'PB  - ', data$publisher, '\n',
                       'ER  - '),
                collapse = '\n')
   

@@ -1,8 +1,11 @@
 #' Find empty fields across bibliographic data
 #' 
-#' @description 
-#' @param refs A dataframe outputted from synthesisr.
-#' @return 
+#' @description Fill in missing information for a bibliuographic dataset by 
+#' searching the Open Alex API.
+#' @param refs A data frame outputted from synthesisr.
+#' @return A data frame matching the input in style, but containing filled in 
+#' information where there were blanks. Where multiple matches were obtained on 
+#' Open Alex, these are provided for the user to decide which to retain.
 #' @export
 #' @examples 
 #' \dontrun{
@@ -13,7 +16,7 @@
 #' file <- "Users/neal.haddaway/OneDrive - SEI/ESHackathon/4.Remote 2020/citationchaser private/archive/inst/shiny-examples/citationchaser/www/references.ris"
 #' refs <- synthesisr::read_refs(file.choose())
 #' refs <- refs[,1:12] #abstracts split incorrectly so manually remove them for this input file
-#' with_dois <- repair_refs(refs)
+#' repaired refs <- repair_refs(refs)
 #' }
 repair_refs <- function(refs){
   
