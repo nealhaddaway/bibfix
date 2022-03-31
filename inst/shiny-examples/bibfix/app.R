@@ -10,6 +10,7 @@ library(synthesisr)
 library(shinybusy)
 library(openalexR)
 library(openalex)
+library(highcharter)
 
 source('scan_file.R')
 source('plot_health.R')
@@ -70,10 +71,9 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-            br(),
             textOutput('report'),
-            br(),
-            box(flexdashboard::gaugeOutput("plt1"),width=12,background ="green"),
+            #box(flexdashboard::gaugeOutput("plt1"),width=12,background ="green")
+            highchartOutput('plt1'),
             br(),
             plotOutput('health')
         )
@@ -124,13 +124,35 @@ server <- function(input, output) {
     })
     
     #render gauge plot
-    output$plt1 <- renderGauge({
+    output$plt1 <- renderHighchart({
         if (is.null(input$file)) {
             return(NULL)
         } else {
-            gauge(rv$health$n_complete, min = 0, max = rv$n_records, label = paste("healthy"),
-                  gaugeSectors(colors = c("#e43235")
-        ))
+            #gauge(rv$health$n_complete, 
+            #      min = 0, 
+            #      max = rv$n_records, 
+            #      label = paste("healthy"),
+            #      gaugeSectors(colors = c("#e43235")))
+            perfect <- round(rv$health$n_complete/rv$n_records*100, digits=0)
+            good <- round(rv$health$n_abstract/rv$n_records*100, digits=0)
+            ok <- round(rv$health$n_doi/rv$n_records*100, digits=0)
+            
+            highchart(width = 400, height = 400) %>% 
+                hc_chart(type = "solidgauge", marginTop = 50) %>% 
+                hc_tooltip(borderWidth = 0,backgroundColor = 'none',shadow = FALSE,style = list(fontSize = '16px'),
+                           pointFormat = '<span style="font-size:1.5em; color: #000000; font-weight: bold">{point.y}%<t>{series.name}</span>',
+                           positioner = JS("function (labelWidth, labelHeight) {return {x: 200 - labelWidth / 2,y: 200};}")) %>% 
+                hc_pane(startAngle = 0,endAngle = 360,
+                        background = list(
+                            list(outerRadius = '112%',innerRadius = '88%',backgroundColor = JS("Highcharts.Color('#f0b4b5').setOpacity(0.1).get()"),borderWidth =  0),
+                            list(outerRadius = '87%',innerRadius = '63%',backgroundColor = JS("Highcharts.Color('#f0b4b5').setOpacity(0.1).get()"),borderWidth = 0),
+                            list(outerRadius = '62%',innerRadius =  '38%',backgroundColor = JS("Highcharts.Color('#f0b4b5').setOpacity(0.1).get()"),borderWidth = 0))) %>% 
+                hc_yAxis(min = 0,max = 100,lineWidth = 0,tickPositions = list()) %>% 
+                hc_plotOptions(solidgauge = list(borderWidth = '34px',dataLabels = list(enabled = FALSE),linecap = 'round',stickyTracking = FALSE)) %>% 
+                hc_add_series(name = " with DOI",borderColor = '#fae6e8',data = list(list(color = '#e43235',radius = "100%",innerRadius = "100%",y = ok))) %>% 
+                hc_add_series(name = " with abstract",borderColor = '#f0b4b5',data = list(list(color = '#e43235',radius = "75%",innerRadius = "75%",y = good))) %>% 
+                hc_add_series(name = " complete",borderColor = '#e43235',data = list(list(color = '#e43235',radius = "50%",innerRadius = "50%",y = perfect)))
+            
         }
     })
     
