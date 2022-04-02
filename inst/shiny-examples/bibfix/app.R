@@ -1,5 +1,3 @@
-#
-
 library(shiny)
 library(shinydashboard)
 library(flexdashboard)
@@ -14,7 +12,7 @@ library(highcharter)
 
 source('scan_file.R')
 source('plot_health.R')
-source('fill_blanks.R')
+source('repair_refs.R')
 source('reconstruct_abstract.R')
 source('search_openAlex.R')
 source('build_ris.R')
@@ -72,18 +70,32 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
             textOutput('report'),
-            #box(flexdashboard::gaugeOutput("plt1"),width=12,background ="green")
+            br(),
+            textOutput('repair_report'),
+            br(),
             highchartOutput('plt1'),
             br(),
             plotOutput('health')
         )
-    )
+    ),
+    fluidRow(
+        column(12,
+               hr(),
+               'bibfix searches ', tags$a(href='https://openalex.org/', 'OpenAlex'),' using the OA API and ', tags$a(href='https://github.com/massimoaria/openalexR', 'openalexR'), ' by Massimo Aria.',
+               br(),
+               br(),
+               'Please cite as: Haddaway NR, Grainger MJ (2022). bibfix: An R package and Shiny app for repairing and enriching bibliographic data.', 
+               tags$a(href='https://github.com/nealhaddaway/bibfix', 'https://github.com/nealhaddaway/bibfix'),
+               br()))
+    
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
     rv <- reactiveValues()
+    
+    rv$repair_report <- ''
     
     #on file upload
     observeEvent(input$file,{
@@ -98,6 +110,8 @@ server <- function(input, output) {
             rv$upload <- read_refs(input$file$datapath)
             rv$n_records <- nrow(rv$upload)
             rv$health <- scan_file(rv$upload)
+            rv$start_health <- rv$health
+            rv$repair_report <- ''
             
         #create report
             rv$report <- paste0(
@@ -106,6 +120,7 @@ server <- function(input, output) {
                 ' bibliographic records.'
             )
         }
+        
     })
     
     #repair records
@@ -114,8 +129,27 @@ server <- function(input, output) {
         rv$upload <- rv$repaired
         rv$n_records <- nrow(rv$upload)
         rv$health <- scan_file(rv$upload)
+        rv$new_health <- rv$health
         #prepare RIS for download
         rv$download_ris <- build_ris(select(rv$repaired, -c(intID)))
+        
+        #render report
+        rv$repair_report <- 
+        if(rv$new_health$n_complete - rv$start_health$n_complete == 0 && rv$new_health$n_abstract - rv$start_health$n_abstract == 0){
+            "Sorry, we couldn't repair your references :("
+        } else {
+            paste0('Your record now contains ',
+                   rv$new_health$n_complete - rv$start_health$n_complete,
+                   ' additional complete records, and ',
+                   rv$new_health$n_abstract - rv$start_health$n_abstract,
+                   ' new abstracts')
+            }
+        
+    })
+    
+    #render report
+    output$repair_report <- renderText({
+        rv$repair_report
     })
     
     #render report
@@ -171,6 +205,7 @@ server <- function(input, output) {
         tagList(
             br(),
             'Click the button below to repair your RIS file (this may take a minute)',
+            br(),
             br(),
             actionButton('repair', 'Repair RIS')
         )

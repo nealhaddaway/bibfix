@@ -32,6 +32,28 @@ build_ris <- function(data,
     stop('Please ensure the input object is a data frame')
   }
   
+  #add missing columns where necessary (ensures build below works even if fields not present)
+  if(is.null(data$source_type) == TRUE){data$source_type <- NA}
+  if(is.null(data$author) == TRUE){data$author <- NA}
+  if(is.null(data$year) == TRUE){data$year <- NA}
+  if(is.null(data$title) == TRUE){data$title <- NA}
+  if(is.null(data$journal) == TRUE){data$journal <- NA}
+  if(is.null(data$volume) == TRUE){data$volume <- NA}
+  if(is.null(data$issue) == TRUE){data$issue <- NA}
+  if(is.null(data$start_page) == TRUE){data$start_page <- NA}
+  if(is.null(data$end_page) == TRUE){data$end_page <- NA}
+  if(is.null(data$abstract) == TRUE){data$abstract <- NA}
+  if(is.null(data$doi) == TRUE){data$doi <- NA}
+  if(is.null(data$publisher) == TRUE){data$publisher <- NA}
+  if(is.null(data$url) == TRUE){data$url <- NA}
+  if(is.null(data$notes) == TRUE){data$notes <- NA}
+  if(is.null(data$M1) == TRUE){data$M1 <- NA}
+  if(is.null(data$database) == TRUE){data$database <- NA}
+  if(is.null(data$AN) == TRUE){data$AN <- NA}
+  
+  #replace NAs with ''
+  data[is.na(data)==TRUE]=''
+  
   #create RIS file
   ris <- paste(paste0('\n',
                       'TY  - ', data$source_type, '\n',
@@ -45,8 +67,12 @@ build_ris <- function(data,
                       'VL  - ', data$volume, '\n',
                       'IS  - ', data$issue, '\n',
                       'DO  - ', data$doi, '\n',
-                    # 'UR  - ', data$url, '\n',
+                      'UR  - ', data$url, '\n',
                       'PB  - ', data$publisher, '\n',
+                      'N1  - ', data$notes, '\n',
+                      'M1  - ', data$M1, '\n',
+                      'DB  - ', data$DB, '\n',
+                      'AN  - ', data$AN, '\n',
                       'ER  - '),
                collapse = '\n')
   
