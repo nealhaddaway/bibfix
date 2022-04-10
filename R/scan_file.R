@@ -13,7 +13,10 @@ scan_file <- function(refs){
   
   #convert all 'NA's to NAs
   refs[refs=="NA"]=NA
-  
+
+  # if source is used in the ris instead of journal (EMBASE .ris)
+  if(!is.null(refs$source)==TRUE){refs$journal<-refs$source}
+    
   #subset relevant columns, ignore the rest
   if(is.null(refs$source_type) == TRUE){refs$source_type <- NA}
   if(is.null(refs$author) == TRUE){refs$author <- NA}
@@ -27,6 +30,7 @@ scan_file <- function(refs){
   if(is.null(refs$abstract) == TRUE){refs$abstract <- NA}
   if(is.null(refs$doi) == TRUE){refs$doi <- NA}
   if(is.null(refs$publisher) == TRUE){refs$publisher <- NA}
+
   refs <- refs[c('source_type', "author", "year", "title", "journal", "volume", "issue", "start_page", "end_page", "abstract", "doi", "publisher")]
   
   #total records
