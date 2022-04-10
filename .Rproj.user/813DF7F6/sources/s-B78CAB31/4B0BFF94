@@ -1,0 +1,26 @@
+{
+    "id": "4B0BFF94",
+    "path": "~/OneDrive - SEI/ESHackathon/4.Remote 2020/bibfix/inst/shiny-examples/bibfix/app.R",
+    "project_path": "inst/shiny-examples/bibfix/app.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1649585977231.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "75,40",
+        "scrollLine": "63"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1649608144,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1649608144893,
+    "read_only": false,
+    "read_only_alternatives": []
+}

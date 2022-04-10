@@ -5,7 +5,7 @@ account: estech
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5873635
-bundleId: 5758094
+bundleId: 5784068
 url: https://estech.shinyapps.io/bibfix/
-when: 1648931833.51973
-lastSyncTime: 1648931833.51975
+when: 1649609532.46715
+lastSyncTime: 1649609532.46716
