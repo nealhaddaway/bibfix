@@ -63,6 +63,7 @@ repair_refs <- function(refs,
   
   #convert url dois to data only
   refs$doi <- sub('.*.org/', '', refs$doi)
+  refs$doi <- decode_dois(refs$doi)
   
   #replace Google Scholar incomplete fields based on presence of ellipsis '…'
   if (repair_incomplete == TRUE){

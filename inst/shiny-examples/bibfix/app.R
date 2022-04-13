@@ -18,6 +18,7 @@ source('reconstruct_abstract.R')
 source('search_openAlex.R')
 source('build_ris.R')
 source('functions.R')
+source('decode_dois.R')
 
 # Set background colour
 tags$head(tags$style(
