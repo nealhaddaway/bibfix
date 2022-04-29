@@ -20,6 +20,7 @@ source('build_ris.R')
 source('functions.R')
 source('decode_dois.R')
 
+
 # Set background colour
 tags$head(tags$style(
     HTML('
@@ -29,7 +30,9 @@ tags$head(tags$style(
             
                     body, label, input, button, select { 
                       font-family: "Arial";
-                    }')))
+                    }')),
+    includeHTML("google-analytics.html")
+    )
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(

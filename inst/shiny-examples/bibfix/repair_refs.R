@@ -22,7 +22,8 @@ repair_refs <- function(refs,
                         replace_abstracts = FALSE,
                         repair_incomplete = TRUE,
                         source = 'lens',
-                        title_search = TRUE){
+                        title_search = TRUE,
+                        token = 'NFxMqRTdXCQRq3uDl8NgduSAXcEf5DAqLIBAPALydHloF0n1n2Xi'){
   
   #enter polite pool
   suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
