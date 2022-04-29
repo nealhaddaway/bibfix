@@ -1,6 +1,8 @@
 #' Plot RIS file health
 #' remotes::install_git("https://git.rud.is/hrbrmstr/ggchicklet.git")
-#' health_check <- scan_file(refs)
+#' report <- scan_file(refs)
+#' health_plot <- plot_health(report)
+#' health_plot
 plot_health <- function(health_check){
   
   reportdf <- as.data.frame(health_check)
@@ -18,23 +20,25 @@ plot_health <- function(health_check){
   reportdf <- rbind(reportdf, new)
   reportdf$health <- factor(reportdf$health, levels = c('missing', 'healthy'))
   
-  #correct text size in ratio 14/5: https://stackoverflow.com/questions/25061822/ggplot-geom-text-font-size-control
-  geom.text.size <- 5
-  theme.size <- 20
+  geom.text.size <- 4
+  theme.size <- 16
   
-  plot <- ggplot(data=reportdf, aes(x=value, y=field, fill=health)) +
-    geom_bar(stat="identity", position = 'stack') +
+  plot <- ggplot2::ggplot(data=reportdf, ggplot2::aes(x=value, y=field, fill=health)) +
+    ggplot2::geom_bar(stat="identity", position = 'stack') +
     #geom_text(aes(label=value), position = position_dodge(width=0.9), hjust=-0.5, size=geom.text.size, color='grey50') + 
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          panel.background = element_blank(),
-          axis.title.y=element_blank(),
-          axis.ticks.y = element_blank(),
-          text = element_text(size = theme.size, color="grey50"),
-          axis.text = element_text(color="grey50")) +
-    xlim(0, 1.1*max(reportdf$value)) +
-    labs(x = "Health level of field") +
-    scale_fill_manual(values=c('grey90', '#e43235')) + 
-    theme(legend.position = "none")
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          axis.title.y = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank(),
+          text = ggplot2::element_text(size = theme.size, color="grey50"),
+          axis.text = ggplot2::element_text(color="grey50")) +
+    ggplot2::xlim(0, 1.1*max(reportdf$value)) +
+    ggplot2::labs(x = "Health level of field") +
+    ggplot2::scale_fill_manual(values=c('grey90', '#e43235')) + 
+    ggplot2::theme(legend.position = "none")
+  
+  plot <- plotly::ggplotly(plot, tooltip="x")
+  config(plot, displayModeBar = FALSE)
   
   return(plot)
   

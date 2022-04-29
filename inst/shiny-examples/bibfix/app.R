@@ -9,6 +9,7 @@ library(shinybusy)
 library(openalexR)
 library(openalex)
 library(highcharter)
+library(plotly)
 
 source('scan_file.R')
 source('plot_health.R')
@@ -16,6 +17,9 @@ source('repair_refs.R')
 source('reconstruct_abstract.R')
 source('search_openAlex.R')
 source('build_ris.R')
+source('functions.R')
+source('decode_dois.R')
+
 
 # Set background colour
 tags$head(tags$style(
@@ -26,7 +30,9 @@ tags$head(tags$style(
             
                     body, label, input, button, select { 
                       font-family: "Arial";
-                    }')))
+                    }')),
+    includeHTML("google-analytics.html")
+    )
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -75,13 +81,13 @@ ui <- fluidPage(
             br(),
             highchartOutput('plt1'),
             br(),
-            plotOutput('health')
+            plotlyOutput('health')
         )
     ),
     fluidRow(
         column(12,
                hr(),
-               'bibfix searches ', tags$a(href='https://openalex.org/', 'OpenAlex'),' using the OA API and ', tags$a(href='https://github.com/massimoaria/openalexR', 'openalexR'), ' by Massimo Aria.',
+               'bibfix searches ', tags$a(href='https://lens.org/', 'Lens.org'), ' and ', tags$a(href='https://openalex.org/', 'OpenAlex'),' using their APIs, along with the ', tags$a(href='https://github.com/massimoaria/openalexR', 'openalexR'), ' package by Massimo Aria.',
                br(),
                br(),
                'Please cite as: Haddaway NR, Grainger MJ (2022). bibfix: An R package and Shiny app for repairing and enriching bibliographic data.', 
@@ -125,13 +131,13 @@ server <- function(input, output) {
     
     #repair records
     observeEvent(input$repair,{
-        rv$repaired <- repair_refs(rv$upload) 
+        rv$repaired <- repair_refs(rv$upload, title_search = input$search_titles)
         rv$upload <- rv$repaired
         rv$n_records <- nrow(rv$upload)
         rv$health <- scan_file(rv$upload)
         rv$new_health <- rv$health
         #prepare RIS for download
-        rv$download_ris <- build_ris(select(rv$repaired, -c(intID)))
+        rv$download_ris <- suppressWarnings(build_ris(select(rv$repaired, -c(intID))))
         
         #render report
         rv$repair_report <- 
@@ -191,11 +197,11 @@ server <- function(input, output) {
     })
     
     #render health bar plot
-    output$health <- renderPlot({
+    output$health <- renderPlotly({
         if (is.null(input$file)) {
             return(NULL)
         } else {
-            plot_health(rv$health)
+            plot <- plot_health(rv$health)
         }
     })
     
@@ -204,9 +210,9 @@ server <- function(input, output) {
         if (is.null(input$file)) return(NULL)
         tagList(
             br(),
-            'Click the button below to repair your RIS file (this may take a minute)',
+            'Click the button below to repair your RIS file',
             br(),
-            br(),
+            checkboxInput('search_titles', 'Search on titles (may take some time)?', value = FALSE),
             actionButton('repair', 'Repair RIS')
         )
     })

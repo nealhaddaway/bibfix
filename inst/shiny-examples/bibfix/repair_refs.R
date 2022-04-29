@@ -11,16 +11,22 @@
 #' \dontrun{
 #' library(openalex)
 #' devtools::install_github("kth-library/openalex", dependencies = TRUE)
-#' openalex_polite("neal_haddaway@hotmail.com")
+#' openalex::openalex_polite("neal_haddaway@hotmail.com")
 #' devtools::install_github("massimoaria/openalexR", dependencies = TRUE)
 #' library(openalexR)
 #' file <- file.choose()
 #' refs <- synthesisr::read_refs(file)
-#' repaired_refs <- repair_refs(refs, replace_abstracts = TRUE)
+#' repaired_refs <- repair_refs(refs, replace_abstracts = TRUE, title_search = FALSE)
 #' }
 repair_refs <- function(refs, 
                         replace_abstracts = FALSE,
-                        repair_incomplete = TRUE){
+                        repair_incomplete = TRUE,
+                        source = 'lens',
+                        title_search = TRUE,
+                        token = 'NFxMqRTdXCQRq3uDl8NgduSAXcEf5DAqLIBAPALydHloF0n1n2Xi'){
+  
+  #enter polite pool
+  suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
   
   #create internal id
   refs$intID <- as.numeric(rownames(refs))
@@ -29,6 +35,16 @@ repair_refs <- function(refs,
   orig_refs <- refs
   
   ####Tidy and subset####
+  #where journal is missing but source is present (e.g. EMBASE RIS) complete journal based on source
+  if(is.null(refs$journal)==TRUE && is.null(refs$source) == FALSE){refs$journal<-refs$source}
+  
+  #if start_page contains start and end pages, split
+  if(any(grepl('-', refs$start_page))==TRUE){
+    refs$start_page <- str_split_fixed(refs$start_page, '-', 2)[,1]
+    refs$end_page <- str_split_fixed(orig_refs$start_page, '-', 2)[,2]
+    refs[refs == ''] <- NA
+  }
+  
   #if vital columns missing, replace with NAs
   if(is.null(refs$source_type) == TRUE){refs$source_type <- NA}
   if(is.null(refs$author) == TRUE){refs$author <- NA}
@@ -43,6 +59,12 @@ repair_refs <- function(refs,
   if(is.null(refs$doi) == TRUE){refs$doi <- NA}
   if(is.null(refs$publisher) == TRUE){refs$publisher <- NA}
   if(is.null(refs$url) == TRUE){refs$url <- NA}
+  #remove database result urls held behind paywalls
+  if(any(grepl('http://ovidsp.ovid.com/ovidweb', refs$url))==TRUE){refs$url <- NA}
+  
+  #convert url dois to data only
+  refs$doi <- sub('.*.org/', '', refs$doi)
+  refs$doi <- decode_dois(refs$doi)
   
   #replace Google Scholar incomplete fields based on presence of ellipsis '…'
   if (repair_incomplete == TRUE){
@@ -83,52 +105,74 @@ repair_refs <- function(refs,
   if(nrow(doi_refs)==0){
     doi_refs <- NULL
   } else {
-    #find missing records with DOI on Open Alex
-    #search for dois
-    doi_input <- data.frame(ids = doi_refs$doi,
-                            type = 'doi')
+    
+    chunks <- function(d, n){      
+      chunks <- split(d, ceiling(seq_along(d)/n))
+      names(chunks) <- NULL
+      return(chunks)
+    }
+    
+    sets <- chunks(doi_refs$doi, 500)
     
     df1 <- data.frame()
-    for (i in 1:length(doi_input$ids)){
-      query_work <- oaQueryBuild(
-        identifier = paste0("doi:https://doi.org/", doi_input$ids[i]),
-        entity = "works"
-      )
-      res <- oaApiRequest(
-        query_url = query_work
-      )
-      if(length(unlist(res))==0){
-        df1 <- df1
-      } else {
-        df1 <- dplyr::bind_rows(df1, oa2df(res, entity = "works"))
-      }
+    print(paste0('Searching Lens.org for ', nrow(doi_refs), ' DOIs...'))
+    for(i in 1:length(sets)){
+      request <- paste0('{\n\t"query": {\n\t\t"terms": {\n\t\t\t"','doi','": ["', paste0('', paste(unlist(sets[i]), collapse = '", "'), '"'),']\n\t\t}\n\t},\n\t"size":500\n}')
+      data <- getLENSData(token, request) #removed private lens.org API token for GitHub
+      record_json <- httr::content(data, "text")
+      record_list <- jsonlite::fromJSON(record_json) 
+      # report number of input articles returned
+      input_number <- record_list[["total"]]
+      #print(input_number)
+      record_df <- data.frame(record_list)
+      df1 <- dplyr::bind_rows(df1, record_df)
     }
     
     #Tidy results df
     #rename result dataframe columns to match inputs
-    names(df1) <- sub('TI', 'title', names(df1))
-    names(df1) <- sub('AB', 'abstract', names(df1))
-    names(df1) <- sub('SO', 'journal', names(df1))
-    names(df1) <- sub('PU', 'publisher', names(df1))
-    names(df1) <- sub('PY', 'year', names(df1))
-    names(df1) <- sub('DI', 'doi', names(df1))
-    names(df1) <- sub('DT', 'source_type', names(df1))
-    names(df1) <- sub('volume', 'volume', names(df1))
-    names(df1) <- sub('issue', 'issue', names(df1))
-    names(df1) <- sub('first_page', 'start_page', names(df1))
-    names(df1) <- sub('last_page', 'end_page', names(df1))
-    names(df1) <- sub('URL', 'url', names(df1))
+    names(df1) <- sub('data.title', 'title', names(df1))
+    names(df1) <- sub('data.abstract', 'abstract', names(df1))
+    journaldata <- df1$data.source
+    df1$journal <- journaldata$title
+    df1$publisher <- journaldata$publisher
+    names(df1) <- sub('data.year_published', 'year', names(df1))
+    names(df1) <- sub('data.publication_type', 'source_type', names(df1))
+    names(df1) <- sub('data.volume', 'volume', names(df1))
+    names(df1) <- sub('data.issue', 'issue', names(df1))
+    names(df1) <- sub('data.start_page', 'start_page', names(df1))
+    names(df1) <- sub('data.end_page', 'end_page', names(df1))
+    #extract first URL provided
+    df1$url <- unlist(lapply(lapply(df1$data.source_urls, `[[`, 2), paste0, collapse = '; '))
+    #extract doi
+    df1$doi <- unlist(lapply(df1$data.external_ids, function(ch) maditr::vlookup('doi', ch, result_column = 'value', lookup_column = 'type')))
     
-    #remove df$doi URL stem
-    df1$doi <- gsub('https://doi.org/', '', df1$doi)
+    #collapse authors list
+    authors <- list()
+    for (i in 1:length(df1$data.authors)) {
+      authors <- unlist(c(authors, paste0(df1$data.authors[[i]]$last_name, ', ', 
+                                          df1$data.authors[[i]]$first_name, collapse = '; ')))
+    }
+    df1$author <- authors
+    #replace blank authors (', ') with NA
+    df1$author[df1$author==", "]=NA
+    
     #remove irrelevant columns from df1 results
     df1 <- dplyr::select(df1, c(author, year, title, journal, volume, issue, start_page, end_page, publisher, doi, abstract, source_type, url))
-    #collapse authors list
-    new_author <- list()
-    for (i in 1:length(df1$author)) {
-      new_author <- unlist(c(new_author, paste0(df1$author[[i]]$au_name, collapse = '; ')))
+    
+    #replace '' with NA
+    df1[df1=="NA"]=NA
+    
+    #records not found
+    found <- NULL
+    for(i in 1:length(doi_refs$doi)){
+      if(any(grepl(tolower(trimws(doi_refs$doi[i])), tolower(df1$doi), fixed=TRUE) == TRUE)){
+        found_item <- 'found'
+      } else {
+        found_item <- 'not found'
+      }
+      found <- c(found, found_item)
     }
-    df1$author <- new_author
+    notFound_dois <- doi_refs$doi[grep('not found', found)]
     
     #lookup missing information
     #lookup authors
@@ -208,6 +252,148 @@ repair_refs <- function(refs,
     
     #data frame containing duplicates for selection
     duplicate_dois <- doi_refs[duplicated(doi_refs$doi) | duplicated(doi_refs$doi, fromLast = TRUE), ]
+    
+    print(paste0('Lens.org search complete: ', nrow(df1), ' DOIs were found on Lens.org.'))
+  
+    
+    
+    #if some DOIs weren't found on Lens.org, then search Open Alex
+    if (identical(notFound_dois, character(0)) == FALSE){
+      #find missing records with DOI on Open Alex
+      #search for dois
+      doi_input <- data.frame(ids = notFound_dois,
+                              type = 'doi')
+      
+      df1 <- data.frame()
+      print(paste0('Searching Open Alex for ', nrow(doi_input), ' DOIs not found on Lens...'))
+      for (i in 1:length(doi_input$ids)){
+        query_work <- oaQueryBuild(
+          identifier = paste0("doi:https://doi.org/", doi_input$ids[i]),
+          entity = "works"
+        )
+        suppressMessages(invisible(capture.output(res <- oaApiRequest(query_url = query_work))))
+        if(length(unlist(res))==0){
+          df1 <- df1
+        } else {
+          df1 <- dplyr::bind_rows(df1, oa2df(res, entity = "works"))
+        }
+      }
+      
+      if(nrow(df1)==0){
+        doi_refs <- NULL
+        print('No records found on Open Alex.')
+      } else {
+        
+        #Tidy results df
+        #rename result dataframe columns to match inputs
+        names(df1) <- sub('TI', 'title', names(df1))
+        names(df1) <- sub('AB', 'abstract', names(df1))
+        names(df1) <- sub('SO', 'journal', names(df1))
+        names(df1) <- sub('PU', 'publisher', names(df1))
+        names(df1) <- sub('PY', 'year', names(df1))
+        names(df1) <- sub('DI', 'doi', names(df1))
+        names(df1) <- sub('DT', 'source_type', names(df1))
+        names(df1) <- sub('volume', 'volume', names(df1))
+        names(df1) <- sub('issue', 'issue', names(df1))
+        names(df1) <- sub('first_page', 'start_page', names(df1))
+        names(df1) <- sub('last_page', 'end_page', names(df1))
+        names(df1) <- sub('URL', 'url', names(df1))
+        
+        #collapse authors list
+        new_author <- list()
+        for (i in 1:length(df1$author)) {
+          new_author <- unlist(c(new_author, paste0(df1$author[[i]]$au_name, collapse = '; ')))
+        }
+        df1$author <- new_author
+        
+        #remove df$doi URL stem
+        df1$doi <- gsub('https://doi.org/', '', df1$doi)
+        #remove irrelevant columns from df1 results
+        df1 <- dplyr::select(df1, c(author, year, title, journal, volume, issue, start_page, end_page, publisher, doi, abstract, source_type, url))
+        
+        #lookup missing information
+        #lookup authors
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(author = ifelse(is.na(author.x), author.y, author.x)) %>%
+          dplyr::select(-c(author.x, author.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup title
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(title = ifelse(is.na(title.x), title.y, title.x)) %>%
+          dplyr::select(-c(title.x, title.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup abstract
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(abstract = ifelse(is.na(abstract.x), abstract.y, abstract.x)) %>%
+          dplyr::select(-c(abstract.x, abstract.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup journal
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(journal = ifelse(is.na(journal.x), journal.y, journal.x)) %>%
+          dplyr::select(-c(journal.x, journal.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup publisher
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(publisher = ifelse(is.na(publisher.x), publisher.y, publisher.x)) %>%
+          dplyr::select(-c(publisher.x, publisher.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup volume
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(volume = ifelse(is.na(volume.x), volume.y, volume.x)) %>%
+          dplyr::select(-c(volume.x, volume.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup issue
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(issue = ifelse(is.na(issue.x), issue.y, issue.x)) %>%
+          dplyr::select(-c(issue.x, issue.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup start_page
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(start_page = ifelse(is.na(start_page.x), start_page.y, start_page.x)) %>%
+          dplyr::select(-c(start_page.x, start_page.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup end_page
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(end_page = ifelse(is.na(end_page.x), end_page.y, end_page.x)) %>%
+          dplyr::select(-c(end_page.x, end_page.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        #lookup url
+        doi_refs <- doi_refs %>%
+          dplyr::left_join(df1, by = c("doi")) %>%
+          dplyr::mutate(url = ifelse(is.na(url.x), url.y, url.x)) %>%
+          dplyr::select(-c(url.x, url.y)) %>%
+          dplyr::select(-c(contains('.y')))
+        names(doi_refs) <- sub('.x', '', names(doi_refs))
+        
+        #reorder columns
+        doi_refs <- doi_refs[, c("intID", "source_type", "author", "year", "title", "journal", "volume", "issue", "start_page", "end_page", "abstract", "doi", 
+                                 "publisher", "url")]
+        
+        #data frame containing duplicates for selection
+        duplicate_dois <- doi_refs[duplicated(doi_refs$doi) | duplicated(doi_refs$doi, fromLast = TRUE), ]
+        
+        print(paste0('Open Alex DOI search complete: ', nrow(df1), ' DOIs were found on Open Alex.'))
+        
+      }
+    }
   }
   ####End DOI section####
   
@@ -215,7 +401,8 @@ repair_refs <- function(refs,
   #subset records without doi missing information but with a title
   title_refs <- subset(missing_refs, (is.na(doi)==TRUE & is.na(title)==FALSE))
   
-  if(nrow(title_refs)==0){
+  if(title_search == TRUE){
+    if(nrow(title_refs)==0){
     title_refs <- NULL
   } else {
     ####Search Open Alex for titles####
@@ -225,6 +412,7 @@ repair_refs <- function(refs,
                               type = 'title')
     
     df2 <- data.frame()
+    print(paste0('Searching for ', nrow(title_refs),' titles on Open Alex...'))
     for (i in 1:length(title_input$ids)){
       query_work <- oaQueryBuild(
         identifier = NULL,
@@ -371,9 +559,13 @@ repair_refs <- function(refs,
         dplyr::summarise_all(coalesce_by_column)
       #data frame containing duplicates for selection
       duplicate_titles <- title_refs[duplicated(title_refs$title) | duplicated(title_refs$title, fromLast = TRUE), ]
+      print('Open Alex title search complete.')
     }
     ####End title section####
   }
+  } else {
+      title_refs <- NULL
+    }
   #bind doi lookup and title lookup table with original values not missing information
   result <- dplyr::bind_rows(non_missing, doi_refs, title_refs)
   
