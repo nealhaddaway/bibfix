@@ -21,9 +21,14 @@ source('functions.R')
 source('decode_dois.R')
 
 
-# Set background colour
-tags$head(tags$style(
-    HTML('
+
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+    
+    # Set background colour
+    tags$head(tags$style(
+        HTML('
                      #sidebar {
                         background-color: #ffbdbd;
                     }
@@ -31,11 +36,8 @@ tags$head(tags$style(
                     body, label, input, button, select { 
                       font-family: "Arial";
                     }')),
-    includeHTML("google-analytics.html")
-    )
-
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+        includeHTML(("google-analytics.html"))
+    ),
 
     # Application title
     titlePanel("bibfix"),
