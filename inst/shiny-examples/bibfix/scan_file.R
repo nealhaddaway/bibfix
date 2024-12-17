@@ -27,7 +27,8 @@ scan_file <- function(refs){
   if(is.null(refs$abstract) == TRUE){refs$abstract <- NA}
   if(is.null(refs$doi) == TRUE){refs$doi <- NA}
   if(is.null(refs$publisher) == TRUE){refs$publisher <- NA}
-  refs <- refs[c('source_type', "author", "year", "title", "journal", "volume", "issue", "start_page", "end_page", "abstract", "doi", "publisher")]
+  if(is.null(refs$accession_zr) == TRUE){refs$accession_zr <- NA}
+  refs <- refs[c('source_type', "author", "year", "title", "journal", "volume", "issue", "start_page", "end_page", "abstract", "doi", "publisher","accession_zr")]
   
   #total records
   n_total <- nrow(refs)
@@ -43,6 +44,7 @@ scan_file <- function(refs){
   n_end_page <- sum(!is.na(refs$end_page))
   n_doi <- sum(!is.na(refs$doi))
   n_abstract <- sum(!is.na(refs$abstract))
+  n_accession <- sum(!is.na(refs$accession_zr))
   
   #number with DOIs
   with_doi <- n_doi
@@ -74,7 +76,8 @@ scan_file <- function(refs){
                  n_doi = n_doi,
                  n_abstract = n_abstract,
                  n_findable_titles = n_findable_titles,
-                 n_total = n_total)
+                 n_total = n_total,
+                 n_accession=n_accession)
   
   return(output)
   
