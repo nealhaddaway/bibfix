@@ -20,6 +20,7 @@ source('build_ris.R')
 source('functions.R')
 source('decode_dois.R')
 
+options(shiny.maxRequestSize = 100*1024^2)
 
 # Set background colour
 tags$head(tags$style(
