@@ -87,5 +87,3 @@ n_retracted<-sum(refs$isRetracted)
   
   return(output)
 }
-
-scan_file(test_ris)
