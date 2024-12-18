@@ -5,6 +5,8 @@
 #' health_plot
 plot_health <- function(health_check){
   
+  
+  health_check<-health_check[-1]
   reportdf <- as.data.frame(health_check)
   
   # Select relevant fields including n_retracted

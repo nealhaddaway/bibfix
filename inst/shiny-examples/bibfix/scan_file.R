@@ -50,12 +50,20 @@ scan_file <- function(refs) {
   n_findable_titles <- sum(is.na(refs$doi) & !is.na(refs$title))
   
   # Search for "retracted"
-  n_retracted <- sum(apply(refs, 1, function(row) {
-    any(grepl("retracted", row, ignore.case = TRUE, useBytes = TRUE))
-  }))
+  
+#  retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
+  
+  Retracted <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/bibfix/Retracted.RDS")
+  
+refs<-refs |> 
+    mutate(isRetracted=if_else(doi %in% Retracted$RetractionDOI, 1, 0))
+  
+n_retracted<-sum(refs$isRetracted)  
+
   
   # Return results
   output <- list(
+    refs=refs,
     n_complete = n_complete,
     n_author = n_author,
     n_year = n_year,

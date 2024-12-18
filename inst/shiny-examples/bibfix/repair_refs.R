@@ -28,6 +28,11 @@ repair_refs <- function(refs,
   #enter polite pool
   suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
   
+  #remove retracted studies
+refs<-refs |> 
+  filter(isRetracted==0)
+  
+  
   #create internal id
   refs$intID <- as.numeric(rownames(refs))
   
@@ -267,11 +272,7 @@ repair_refs <- function(refs,
       df1 <- data.frame()
       print(paste0('Searching Open Alex for ', nrow(doi_input), ' DOIs not found on Lens...'))
       for (i in 1:length(doi_input$ids)){
-        query_work <- oaQueryBuild(
-          identifier = paste0("doi:https://doi.org/", doi_input$ids[i]),
-          entity = "works"
-        )
-        suppressMessages(invisible(capture.output(res <- oaApiRequest(query_url = query_work))))
+          suppressMessages(invisible(capture.output(res <- oa_fetch(identifier = paste0("doi:https://doi.org/", doi_input$ids[i]),entity = "works"))))
         if(length(unlist(res))==0){
           df1 <- df1
         } else {
@@ -414,17 +415,11 @@ repair_refs <- function(refs,
     df2 <- data.frame()
     print(paste0('Searching for ', nrow(title_refs),' titles on Open Alex...'))
     for (i in 1:length(title_input$ids)){
-      query_work <- oaQueryBuild(
+      res <- oa_fetch(
         identifier = NULL,
         entity = "works",
-        filter=paste0('title.search:', title_input$ids[i]),
-        search=NULL,
-        sort="relevance_score:desc",
-        endpoint = "https://api.openalex.org/"
-      )
-      res <- oaApiRequest(
-        query_url = query_work
-      )
+        title.search= title_input$ids[i])
+      
       if(length(unlist(res))==0){
         new_row <- data.frame(id='not found', TI=title_input$ids[i])
         df2 <- dplyr::bind_rows(df2, new_row)
