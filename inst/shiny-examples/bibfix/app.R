@@ -20,6 +20,7 @@ source('build_ris.R')
 source('functions.R')
 source('decode_dois.R')
 
+options(shiny.maxRequestSize = 100*1024^2)
 
 # Set background colour
 tags$head(tags$style(
@@ -131,7 +132,7 @@ server <- function(input, output) {
     
     #repair records
     observeEvent(input$repair,{
-        rv$repaired <- repair_refs(rv$upload, title_search = input$search_titles)
+        rv$repaired <- repair_refs(rv$health$refs, title_search = input$search_titles)
         rv$upload <- rv$repaired
         rv$n_records <- nrow(rv$upload)
         rv$health <- scan_file(rv$upload)
