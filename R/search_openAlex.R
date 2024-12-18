@@ -23,6 +23,7 @@
 #' results <- search_openAlex(input)
 #' }
 search_openAlex <- function(input){
+  
   titles <- subset(input, type == 'title')
   if(nrow(titles)!=0){
     titles_outputs <- list()
