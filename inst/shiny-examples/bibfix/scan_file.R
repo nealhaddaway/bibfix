@@ -9,6 +9,11 @@
 #' refs <- synthesisr::read_refs(file.choose())
 #' report <- scan_file(refs)
 #' }
+#' 
+
+library(synthesisr)
+library(tidyverse)
+
 scan_file <- function(refs) {
   
   # Convert all 'NA's to NAs
@@ -51,12 +56,10 @@ scan_file <- function(refs) {
   
   # Search for "retracted"
   
-#  retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
-  
-  Retracted <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/bibfix/Retracted.RDS")
+ retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
   
 refs<-refs |> 
-    mutate(isRetracted=if_else(doi %in% Retracted$RetractionDOI, 1, 0))
+    mutate(isRetracted=if_else(doi %in% c(retracted_test$OriginalPaperDOI, retracted_test$RetractionDOI), 1, 0))
   
 n_retracted<-sum(refs$isRetracted)  
 
@@ -82,3 +85,5 @@ n_retracted<-sum(refs$isRetracted)
   
   return(output)
 }
+
+scan_file(test_ris)
