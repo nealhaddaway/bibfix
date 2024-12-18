@@ -27,15 +27,7 @@ repair_refs <- function(refs,
   
   #enter polite pool
   suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
-  
-  #remove retracted studies
-retracted_refs <- refs |>
-  filter(isRetracted==1)
-  
-refs<-refs |> 
-  filter(isRetracted==0)
-  
-  
+
   #create internal id
   refs$intID <- as.numeric(rownames(refs))
   
