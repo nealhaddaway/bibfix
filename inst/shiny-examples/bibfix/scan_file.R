@@ -56,7 +56,9 @@ scan_file <- function(refs) {
   
   # Search for "retracted"
   
- retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
+ # retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
+ 
+ retracted<-read.csv("https://raw.githubusercontent.com/Mark-Eng/bibfix/refs/heads/master/data/retraction_watch.csv")
   
 refs<-refs |> 
     mutate(isRetracted=if_else(doi %in% c(retracted_test$OriginalPaperDOI, retracted_test$RetractionDOI), 1, 0))
