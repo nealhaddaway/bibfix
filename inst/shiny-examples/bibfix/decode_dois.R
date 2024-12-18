@@ -36,11 +36,16 @@ decode_dois <- function(dois,
   dois <- data.frame(dois)
   
   #load lookup_table
-  lookup_table <- read.delim('www/lookup_table.txt',
-                             sep = '\t', 
-                             header =  TRUE, 
-                             quote = '')
-  
+  # lookup_table <- read.delim('inst/shiny-examples/bibfix/www/lookup_table.txt',
+  #                            sep = '\t',
+  #                            header =  TRUE,
+  #                            quote = '')
+
+ lookup_table <- read.delim('www/lookup_table.txt',
+                            sep = '\t',
+                            header =  TRUE,
+                            quote = '')
+
   #replace characters using lookup table
   dois <- dois %>% 
     dplyr::mutate(across(c(dois), ~ stringi::stri_replace_all_fixed(
