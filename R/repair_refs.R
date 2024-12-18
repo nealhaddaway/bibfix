@@ -19,7 +19,8 @@ repair_refs <- function(refs,
                         repair_incomplete = TRUE,
                         source = 'lens',
                         title_search = TRUE,
-                        token = 'NFxMqRTdXCQRq3uDl8NgduSAXcEf5DAqLIBAPALydHloF0n1n2Xi'){
+                        token = 'NFxMqRTdXCQRq3uDl8NgduSAXcEf5DAqLIBAPALydHloF0n1n2Xi')
+  {
   
   #enter polite pool
   suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
@@ -414,7 +415,7 @@ refs<-refs |>
         }
         )
           
-  }
+  }}
   ####End DOI section####
   
   ####Title section####
@@ -582,10 +583,10 @@ refs<-refs |>
     }}}
       
     ####End title section####
-  }
   } else {
       title_refs <- NULL
-    }
+  }
+  
   #bind doi lookup and title lookup table with original values not missing information
   result <- dplyr::bind_rows(non_missing, doi_refs, title_refs)
   
@@ -606,11 +607,10 @@ refs<-refs |>
   output <- intermediate %>%
     dplyr::group_by(intID) %>%
     dplyr::summarise_all(coalesce_by_column)
-  
+
   return(output)
-  
-    }
   }
+  
 
 
 coalesce_by_column <- function(df) {
