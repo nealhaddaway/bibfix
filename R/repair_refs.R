@@ -415,7 +415,8 @@ refs<-refs |>
         }
         )
           
-  }}
+      }}
+  }
   ####End DOI section####
   
   ####Title section####
