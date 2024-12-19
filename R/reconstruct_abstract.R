@@ -16,7 +16,7 @@
 #' 'abstract_inverted_index_the2').
 #' @return A single character string corresponding to the original 
 #' abstract.
-#' @export
+#' @keywords internal
 #' @examples 
 #' \dontrun{
 #' devtools::install_github("kth-library/openalex", dependencies = TRUE)

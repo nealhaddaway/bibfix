@@ -6,11 +6,11 @@
 #' @param url A publisher or other URL for an article that does
 #' not contain a doi within the link.
 #' @return A character string corresponding to the DOI.
-#' @export
 #' @examples \dontrun{
 #' url <- 'https://www.sciencedirect.com/science/article/pii/S0048969703000068'
 #' doi <- crawl_url(url)
 #' }
+#' @keywords internal
 crawl_url <- function(url){
   url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
   tryCatch(

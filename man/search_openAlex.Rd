@@ -34,3 +34,4 @@ input <- data.frame(ids = c('10.1371/journal.pone.0138237', '10.1186/s13750-016-
 results <- search_openAlex(input)
 }
 }
+\keyword{internal}
