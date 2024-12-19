@@ -1,0 +1,22 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/reference/build_ris.html</loc></url>
+<url><loc>/reference/crawl_url.html</loc></url>
+<url><loc>/reference/crawl_urls.html</loc></url>
+<url><loc>/reference/decode_dois.html</loc></url>
+<url><loc>/reference/getLENSData.html</loc></url>
+<url><loc>/reference/get_citation.html</loc></url>
+<url><loc>/reference/get_refs.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/plot_health.html</loc></url>
+<url><loc>/reference/reconstruct_abstract.html</loc></url>
+<url><loc>/reference/repair_refs.html</loc></url>
+<url><loc>/reference/runBibfixApp.html</loc></url>
+<url><loc>/reference/scan_file.html</loc></url>
+<url><loc>/reference/search_openAlex.html</loc></url>
+</urlset>
+

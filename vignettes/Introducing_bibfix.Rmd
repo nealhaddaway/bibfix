@@ -1,0 +1,19 @@
+---
+title: "Introducing_bibfix"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introducing_bibfix}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bibfix)
+```
