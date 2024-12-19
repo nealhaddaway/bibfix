@@ -19,7 +19,7 @@ repair_refs <- function(refs,
                         repair_incomplete = TRUE,
                         source = 'lens',
                         title_search = TRUE,
-                        token = 'NFxMqRTdXCQRq3uDl8NgduSAXcEf5DAqLIBAPALydHloF0n1n2Xi')
+                        token = Sys.getenv("bibfix_token"))
   {
   
   #enter polite pool
