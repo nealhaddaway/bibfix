@@ -53,7 +53,9 @@ scan_file <- function(refs) {
 
   #  retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
 
-  Retracted <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/bibfix/Retracted.RDS")
+  url <- "https://raw.githubusercontent.com/nealhaddaway/bibfix/refs/heads/master/data/retraction_watch.csv"
+  #read csv from url
+Retracted<-read.csv(url)
 
   refs <- refs |>
     mutate(isRetracted = if_else(doi %in% Retracted$OriginalPaperDOI, 1, 0))
