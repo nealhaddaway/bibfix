@@ -10,7 +10,6 @@
 
 The package is a work in progress and is part of the <a href="https://www.eshackathon.org/" target="_blank">Evidence Synthesis Hackathon</a>.
 
-## Here is a quick example of the workflow.
 
 To install the latest version of the package:
 
