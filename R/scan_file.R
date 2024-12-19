@@ -58,7 +58,7 @@ scan_file <- function(refs) {
 Retracted<-read.csv(url)
 
   refs <- refs |>
-    mutate(isRetracted = if_else(doi %in% Retracted$OriginalPaperDOI, 1, 0))
+    mutate(isRetracted = dplyr::if_else(doi %in% Retracted$OriginalPaperDOI, 1, 0))
 
   n_retracted <- sum(refs$isRetracted)
 

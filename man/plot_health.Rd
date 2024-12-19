@@ -2,18 +2,15 @@
 % Please edit documentation in R/plot_health.R
 \name{plot_health}
 \alias{plot_health}
-\title{Plot RIS file health
-remotes::install_git("https://git.rud.is/hrbrmstr/ggchicklet.git")
-report <- scan_file(refs)
-health_plot <- plot_health(report)
-health_plot}
+\title{Plot RIS file health}
 \usage{
 plot_health(health_check, session = NULL)
 }
+\arguments{
+\item{health_check}{result of bibfix::scan_file()}
+
+\item{session}{if used in shiny the plot is a plotly version}
+}
 \description{
 Plot RIS file health
-remotes::install_git("https://git.rud.is/hrbrmstr/ggchicklet.git")
-report <- scan_file(refs)
-health_plot <- plot_health(report)
-health_plot
 }

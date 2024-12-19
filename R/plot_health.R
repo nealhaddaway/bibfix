@@ -1,8 +1,9 @@
 #' Plot RIS file health
-#' remotes::install_git("https://git.rud.is/hrbrmstr/ggchicklet.git")
-#' report <- scan_file(refs)
-#' health_plot <- plot_health(report)
-#' health_plot
+#'
+#' @param health_check result of bibfix::scan_file()
+#' @param session if used in shiny the plot is a plotly version
+#'
+#' @export
 plot_health <- function(health_check, session=NULL){
   
   
