@@ -31,10 +31,19 @@ Description: bibfix is an R package (with future plans for a Shiny app) that
 Imports:
     magrittr,
     utils,
-    tools
+    tools,
+    MESS, 
+    data.table, 
+    dplyr,
+    httr,
+    jsonlite,
+    maditr,
+    stringi,
+    tibble
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 2.10)
+LazyData: true

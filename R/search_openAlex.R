@@ -12,7 +12,7 @@
 #' here).
 #' @return a list of character vectors of named reference items returned 
 #' from the Open Alex API.
-#' @export
+#' @keywords internal
 #' @examples 
 #' \dontrun{
 #' devtools::install_github("kth-library/openalex", dependencies = TRUE)
@@ -23,6 +23,7 @@
 #' results <- search_openAlex(input)
 #' }
 search_openAlex <- function(input){
+  
   titles <- subset(input, type == 'title')
   if(nrow(titles)!=0){
     titles_outputs <- list()

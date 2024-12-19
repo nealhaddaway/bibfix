@@ -1,0 +1,69 @@
+---
+title: "Introducing bibfix"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introducing_bibfix}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# bibfix <img src="bibfix hex.png" align="right" width="20%"/>
+
+`bibfix` is an R package and a Shiny app that helps users repair and enrich their bibliographic data. It does so through a suite of functions that request bibliographic data from API services including OpenAlex and The Lens.org. Repaired fields can include titles, abstract, unique identifiers (e.g. DOIs), publication years, etc. In addition, bibliographic records can be supplemented with additional information, including internal identifiers for common databases (e.g. The Lens.org, PubMed, Microsoft Academic) that facilitate deduplication, and information such as author affiliations and identifiers (e.g. ORCIDs).
+
+The package is a work in progress and is part of the <a href="https://www.eshackathon.org/" target="_blank">Evidence Synthesis Hackathon</a>.
+
+## Here is a quick example of the workflow.
+
+To install the latest version of the package:
+
+```{r, eval=FALSE}
+remotes::install_github("nealhaddaway/bibfix")
+```
+
+The package is in active development so please make sure you always have the most up-to-date version. 
+
+We use `synthesisr` to read in a [.ris file](https://en.wikipedia.org/wiki/RIS_(file_format)) and we use functions in `tidyverse` for data wrangling and visualisations.
+
+```{r setup, echo=TRUE, message=FALSE, warning=FALSE}
+library(bibfix)
+library(synthesisr)
+library(tidyverse)
+```
+
+Read in a .ris file. `synthesisr` converts the .ris file to a dataframe. 
+
+```{r read in the refs, echo=TRUE, message=FALSE, warning=FALSE}
+refs<-synthesisr::read_refs(paste0(system.file(package="bibfix"),"/shiny-examples/bibfix/www/references.ris"))
+```
+
+First we can assess the "health" (how complete the file is) using the `scan_file()` function. 
+
+```{r scan_file, echo=TRUE, message=FALSE, warning=FALSE}
+check_refs<-scan_file(refs)     
+```
+
+We can then plot out the percentage of references that have complete data across fields. 
+
+```{r plot health, echo=TRUE, message=FALSE, warning=FALSE}
+plot_health(check_refs) 
+```
+
+The `repaired_refs()` function searches on [lens.org](lens.org) and [OpenAlex](https://openalex.org/) to try and fill in missing (meta)data. 
+
+```{r repair, echo=TRUE, message=FALSE, warning=FALSE}
+repaired_refs<-repair_refs(check_refs$refs)                      
+```
+
+```{r compare files, echo=TRUE, message=FALSE, warning=FALSE}
+scan_repaired<-scan_file(repaired_refs)
+
+```
+You can see that we have managed to add complete data for a further `r scan_repaired$n_complete- check_refs$n_complete` articles. We have added a further `r scan_repaired$n_abstract- check_refs$n_abstract` abstracts.
