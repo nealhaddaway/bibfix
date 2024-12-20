@@ -17,13 +17,12 @@
 repair_refs <- function(refs, 
                         replace_abstracts = FALSE,
                         repair_incomplete = TRUE,
-                        source = 'lens',
                         title_search = TRUE,
-                        token = Sys.getenv("bibfix_token"))
+                        token = token)
   {
   
   #enter polite pool
-  suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
+#  suppressMessages(invisible(capture.output(openalex::openalex_polite("neal_haddaway@hotmail.com"))))
 
   #create internal id
   refs$intID <- as.numeric(rownames(refs))
@@ -115,7 +114,7 @@ repair_refs <- function(refs,
     print(paste0('Searching Lens.org for ', nrow(doi_refs), ' DOIs...'))
     for(i in 1:length(sets)){
       request <- paste0('{\n\t"query": {\n\t\t"terms": {\n\t\t\t"','doi','": ["', paste0('', paste(unlist(sets[i]), collapse = '", "'), '"'),']\n\t\t}\n\t},\n\t"size":500\n}')
-      data <- getLENSData(token, request) #removed private lens.org API token for GitHub
+      data <- bibfix:::getLENSData(token, request) #removed private lens.org API token for GitHub
       record_json <- httr::content(data, "text")
       record_list <- jsonlite::fromJSON(record_json) 
       # report number of input articles returned
