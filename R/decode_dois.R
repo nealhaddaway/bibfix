@@ -37,7 +37,7 @@ decode_dois <- function(dois,
   
   #load lookup_table
   # need to replace this with call from bibfix
-  load("C:/Users/matthew.grainger/Documents/Projects_in_development/bibfix/data/lookup_table.rda")
+ lookup_table<-bibfix::lookup_table
 
   #replace characters using lookup table
   dois <- dois %>% 
