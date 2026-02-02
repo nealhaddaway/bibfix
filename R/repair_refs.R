@@ -430,11 +430,38 @@ repair_refs <- function(refs,
     df2 <- data.frame()
     print(paste0('Searching for ', nrow(title_refs),' titles on Open Alex...'))
     
+#' Clean_query_text
+#' Escape special characters in text
+#' @param text text to query e.g. title
+#'
+#' @returns clean text
+#' @keywords internal
+
+    clean_query_text <- function(text) {
+      # Convert to UTF-8 to avoid encoding issues
+      text <- enc2utf8(text)
+      
+      # Escape special characters used in API queries
+      text <- gsub('(["\\])', '\\\\\\1', text)
+      
+      # Remove any non-printable characters
+      text <- gsub("[^[:print:]]", "", text)
+      # Remove all commas
+      text <- gsub(",", "", text)
+      
+      # Trim extra whitespace
+      text <- trimws(text)
+      
+      return(text)
+    }
+    
     for (i in 1:length(title_input$ids)){
       tryCatch({res <- oa_fetch(
         identifier = NULL,
         entity = "works",
-        title.search= title_input$ids[i])
+        title.search= clean_query_text(title_input$ids[i]))
+      }, error = function(e) {
+        message(paste("Error processing Title:", title_input$ids[i], " - ", e$message))
       
       if(length(unlist(res))==0){
         new_row <- data.frame(id='not found', TI=title_input$ids[i])
@@ -442,11 +469,9 @@ repair_refs <- function(refs,
       } else {
         df2 <- dplyr::bind_rows(df2, oa2df(res, entity = "works"))
       }
-    }, error = function(e) {
-      message(paste("Error processing Title:", title_input$ids[i], " - ", e$message))
-    }, warning = function(w) {
-      message(paste("Warning processing title:", title_input$ids[i], " - ", w$message))
-    })
+    
+      })
+      }
     #rename result dataframe columns to match inputs
     names(df2) <- sub('TI', 'title', names(df2))
     names(df2) <- sub('AB', 'abstract', names(df2))

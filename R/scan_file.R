@@ -52,10 +52,12 @@ scan_file <- function(refs) {
   # Testing with local - needs to change
 
   #  retracted<-read.csv("https://api.labs.crossref.org/data/retractionwatch?name@email.org")
+  
+  bibfix::retraction_watch
 
-  url <- "https://raw.githubusercontent.com/nealhaddaway/bibfix/refs/heads/master/data/retraction_watch.csv"
-  #read csv from url
-Retracted<-read.csv(url)
+#   url <- "https://raw.githubusercontent.com/nealhaddaway/bibfix/refs/heads/master/data/retraction_watch.csv"
+#   #read csv from url
+# Retracted<-read.csv(url)
 
   refs <- refs |>
     mutate(isRetracted = dplyr::if_else(doi %in% Retracted$OriginalPaperDOI, 1, 0))
